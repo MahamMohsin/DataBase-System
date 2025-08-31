@@ -1,0 +1,1 @@
+This repository contains my Database Lab work, including SQL queries, schema design, normalization exercises, and practical implementations of database concepts. The repo demonstrates CRUD operations, constraints, aggregate functions, joins, subqueries, indexing, and optimization techniques.
