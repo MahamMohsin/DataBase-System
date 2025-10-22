@@ -1,0 +1,238 @@
+--all employees name ending with aa
+select first_name||' '||last_name AS fullname from employees where first_name||' '||last_name like '%a';
+
+
+
+--Find the department IDs and their average salaries for departments where the average salary is greater than 2500.
+select e.department_id,round(avg(e.salary),2) from employees e join DEPARTMENTS d on 
+(e.DEPARTMENT_ID=d.DEPARTMENT_ID) group by e.DEPARTMENT_ID HAVING avg(e.SALARY)>2500;
+
+
+
+
+--Display each employee’s full name and the number of years they have worked in the company.
+select first_name||' '||last_name as fullname,
+floor(MONTHS_BETWEEN(SYSDATE,hire_date)/12) as years from EMPLOYEES;
+
+
+
+
+--Display the first name, job ID, and salary of all employees whose job title is Accountant.
+select e.first_name,e.job_id,e.salary from employees e join jobs j 
+on (e.job_id=j.JOB_ID) where lower(j.JOB_TITLE)='accountant';
+
+
+
+
+--Display Employee_ID, Job_Name, Job_ID, Department_ID, number of days worked in all jobs in department 90.
+SELECT employee_id, job_id, department_id,
+       (end_date - start_date) AS days_worked
+FROM job_history
+WHERE department_id = 90;
+
+
+
+--Find all employees in the same department as employee ID 40 who earn the same salary as that employee.
+select e.first_name,e.salary,e.department_id from employees e 
+where e.SALARY = (select salary from employees ee where ee.DEPARTMENT_ID=40 and ee.DEPARTMENT_ID=e.DEPARTMENT_ID);
+
+
+
+
+--List the names, emails, and hire dates of employees who were hired after the employee with ID 165.
+select e.first_name,e.email,e.hire_date from employees e where e.HIRE_DATE >
+(select hire_date from employees ee where ee.EMPLOYEE_ID=165);
+
+
+
+
+--Retrieve employee details (name, salary, department) for those working in the London office.
+select e.first_name,e.salary,e.salary,e.department_id,l.CITY from employees e join 
+DEPARTMENTS d on (e.DEPARTMENT_ID=d.DEPARTMENT_ID) join locations l on 
+(d.location_id=l.LOCATION_ID) where lower(l.CITY)='london';
+
+
+
+
+--Display all departments where at least one employee has a maximum salary ≥ 7000 and has a record in the job history table.
+select DISTINCT d.* from DEPARTMENTS d join employees e on 
+(e.DEPARTMENT_ID=d.DEPARTMENT_ID) join jobs j on (e.job_id=j.JOB_ID) where
+j.MAX_SALARY>=7000 and e.employee_id in (select jh.employee_id from job_history jh);
+
+
+
+
+
+--Retrieve all departments that have employees whose job’s minimum salary is 8000 or more.
+select d.* from DEPARTMENTS d join employees e on (e.DEPARTMENT_ID=d.DEPARTMENT_ID) 
+join jobs j on (j.JOB_ID=e.JOB_ID) where j.MIN_SALARY>=8000;
+
+
+
+
+--Display the names of all employees who are managers (i.e., those who manage at least one employee).
+select DISTINCT m.first_name||' '||m.last_name as full_name from employees e join 
+employees m on (e.MANAGER_ID=m.EMPLOYEE_ID);
+
+
+
+
+--List all jobs currently held by employees who previously worked as Sales Representatives.
+SELECT DISTINCT j.*
+FROM jobs j
+JOIN employees e ON e.job_id = j.job_id
+JOIN job_history jh ON e.employee_id = jh.employee_id
+WHERE jh.job_id = (
+  SELECT job_id FROM jobs WHERE job_title = 'Sales Representative'
+);
+
+
+
+
+SELECT DISTINCT J.*
+FROM JOBS J
+JOIN EMPLOYEES E ON(E.JOB_ID = J.JOB_ID)
+WHERE E.EMPLOYEE_ID IN (SELECT JH.EMPLOYEE_ID 
+FROM JOB_HISTORY JH
+WHERE JH.JOB_ID = (SELECT JJ.JOB_ID
+FROM JOBS JJ WHERE JJ.JOB_TITLE = 'Sales Representative'));
+
+
+
+
+--Display the details of employees who have never changed their job (no record in JOB_HISTORY).
+select e.* from employees e where e.EMPLOYEE_ID not in (select jh.employee_id from JOB_HISTORY jh);
+
+
+
+
+
+
+--Find all departments managed by Susan.
+select d.* from DEPARTMENTS d join EMPLOYEES e on (d.MANAGER_ID=e.EMPLOYEE_ID) where 
+e.first_name='Susan';
+
+
+
+
+--full name of those employees whose name starts with ‘A’ and ends with ‘n
+select first_name||' '||last_name as fullname from employees where
+first_name||' '||last_name like 'A%n';
+
+
+
+--Show all employees’ last three letters of last name.
+select last_name, substr(last_name,-3) as last3letters from employees;
+
+
+
+--Display First_Name, Job_ID, Salary of all employees whose job is “ACCOUNTANT” (any case).
+select first_name,job_id, salary from employees where
+UPPER(job_id)='ACCOUNTANT';
+
+
+
+
+--Display Employee_ID, First_Name, Salary — highest salary first and lowest last.
+select employee_id,first_name,salary from EMPLOYEES order by salary desc;
+
+
+
+
+--Generate new names by combining first 3 characters of First_Name and last 3 characters of Email.
+select substr(first_name,1,3)||' '||substr(email,-3) as newname from employees;
+
+
+
+
+--List department names and count of employees working in each department.
+select d.department_name,count(e.employee_id)as employees from departments d join
+employees e on (e.department_id=d.DEPARTMENT_ID) group by d.DEPARTMENT_NAME;
+
+
+
+
+
+--Display First_Name, Salary, Phone_Number, Hire_Date, Department_ID of employees whose department is in Toronto.
+select e.first_name,e.salary,e.phone_number,e.hire_date,e.department_id from employees e
+join departments d on (e.department_id=e.DEPARTMENT_ID) join locations l on
+d.location_id=l.LOCATION_ID where l.city='Toronto';
+
+
+
+
+
+--Display employee’s full name along with total number of years in the department.
+select first_name||' '||last_name as fullname,round(MONTHS_BETWEEN(SYSDATE,hire_date)/12) as numofyears 
+from employees;
+
+
+
+
+
+
+
+
+--Display Manager_ID and salary of lowest paid employee of that manager.
+select e.manager_id, min(e.salary) from employees e join
+employees m on (m.employee_id=e.manager_id) GROUP by e.MANAGER_ID;
+
+--or
+
+SELECT manager_id, MIN(salary) AS lowest_salary
+FROM employees
+WHERE manager_id IS NOT NULL
+GROUP BY manager_id
+ORDER BY lowest_salary DESC;
+
+
+
+
+--Display full name and total number of years in the department, excluding those with salary ≤ 2000.
+select salary, first_name||' '||last_name as fullname, round(MONTHS_BETWEEN(SYSDATE,hire_date)/12) as numyears
+from EMPLOYEES where salary>2000;
+
+
+
+
+
+
+--Display Country_Name, City, and number of departments where at least 3 employees work.
+select c.country_name,l.city,COUNT(d.department_id) as total_departments 
+from countries c join locations l on (l.COUNTRY_ID=c.COUNTRY_ID) join
+departments d on (l.location_id=d.LOCATION_ID) join employees e
+on d.DEPARTMENT_ID=e.DEPARTMENT_ID group by c.COUNTRY_NAME,l.CITY HAVING 
+count(employee_id)>=3;
+
+
+
+
+
+
+
+
+--Display Department_Name and average salary where average salary > 2500.
+select d.department_name,round(avg(e.salary),2) from
+departments d join employees e on (d.DEPARTMENT_ID=e.DEPARTMENT_ID) group by 
+d.department_name having AVG(e.SALARY)>2500; 
+
+
+
+
+
+
+
+--Display employees whose last name ends with ‘y’, along with last name, department name, salary, manager ID, and city.
+select e.last_name,d.department_name,e.salary,e.manager_id,l.city from 
+departments d join employees e on (e.DEPARTMENT_ID=d.department_id) join
+locations l on (d.LOCATION_ID=l.LOCATION_ID) where e.LAST_NAME like '%y';
+
+
+
+
+
+
+
+
+--Display all information of employees who never had any job in the past.
+select * from employees WHERE employee_id not in (select EMPLOYEE_ID from JOB_HISTORY);
